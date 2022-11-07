@@ -60,7 +60,7 @@ repositories {
 dependencies {
     implementation(
             localGroovy(),
-            gradleApi(),
+            gradleApi()
     )
     api(
             "org.owasp:dependency-check-core:$odcVersion",
