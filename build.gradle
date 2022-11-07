@@ -20,6 +20,7 @@ ext {
     odcVersion = '7.3.0'
     slackWebhookVersion = '1.4.0'
     spockCoreVersion = '1.1-groovy-2.4'
+    unirestVersion = '1.4.9'
 }
 
 group = 'org.owasp'
@@ -59,12 +60,13 @@ repositories {
 dependencies {
     implementation(
             localGroovy(),
-            gradleApi()
+            gradleApi(),
     )
     api(
             "org.owasp:dependency-check-core:$odcVersion",
             "org.owasp:dependency-check-utils:$odcVersion",
-            "net.gpedro.integrations.slack:slack-webhook:$slackWebhookVersion"
+            "net.gpedro.integrations.slack:slack-webhook:$slackWebhookVersion",
+            "com.mashape.unirest:unirest-java:$unirestVersion"
     )
 
     testImplementation gradleTestKit()

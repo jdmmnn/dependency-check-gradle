@@ -1,4 +1,4 @@
-package org.owasp.dependencycheck.gradle.service
+package org.owasp.dependencycheck.gradle.service.adapter
 
 import com.google.common.base.Preconditions
 import net.gpedro.integrations.slack.SlackApi
@@ -9,15 +9,15 @@ import org.apache.commons.lang3.StringUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class SlackNotificationSenderService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SlackNotificationSenderService.class);
+class SlackAdapter implements NotificationAdapter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SlackAdapter.class)
     public static final String SLACK__WEBHOOK__ENABLED = "SLACK_WEBHOOK_ENABLED"
     public static final String SLACK__WEBHOOK__URL = "SLACK_WEBHOOK_URL"
 
     private boolean enabled = false
     private String webhookUrl
 
-    SlackNotificationSenderService(def settings) {
+    SlackAdapter(def settings) {
         def enabled = settings.getBoolean(SLACK__WEBHOOK__ENABLED)
         def webhookUrl = settings.getString(SLACK__WEBHOOK__URL)
         if (enabled) {
@@ -27,6 +27,7 @@ class SlackNotificationSenderService {
         }
     }
 
+    @Override
     def send(String projectName, String msg) {
         if (enabled) {
             SlackApi api = new SlackApi(webhookUrl)
@@ -39,7 +40,7 @@ class SlackNotificationSenderService {
         }
     }
 
-    private SlackMessage createMessage(String projectName, String msg) {
+    private static SlackMessage createMessage(String projectName, String msg) {
         def message = new SlackMessage("Security issues found in *$projectName*")
         SlackAttachment slackAttachment = new SlackAttachment()
         slackAttachment.setColor("danger")
