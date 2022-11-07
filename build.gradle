@@ -59,7 +59,8 @@ repositories {
 dependencies {
     implementation(
             localGroovy(),
-            gradleApi()
+            gradleApi(),
+            'com.mashape.unirest:unirest-java:1.4.9'
     )
     api(
             "org.owasp:dependency-check-core:$odcVersion",

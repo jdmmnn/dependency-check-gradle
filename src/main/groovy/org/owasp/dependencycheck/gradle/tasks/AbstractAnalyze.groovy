@@ -36,12 +36,14 @@ import org.owasp.dependencycheck.dependency.Confidence
 import org.owasp.dependencycheck.dependency.Dependency
 import org.owasp.dependencycheck.exception.ExceptionCollection
 import org.owasp.dependencycheck.exception.ReportException
-import org.owasp.dependencycheck.gradle.service.SlackNotificationSenderService
+import org.owasp.dependencycheck.gradle.service.NotificationSenderService
+import org.owasp.dependencycheck.gradle.service.adapter.SlackAdapter
 import org.owasp.dependencycheck.utils.SeverityUtil
 
 import java.util.stream.Collectors
 
-import static org.owasp.dependencycheck.dependency.EvidenceType.*
+import static org.owasp.dependencycheck.dependency.EvidenceType.PRODUCT
+import static org.owasp.dependencycheck.dependency.EvidenceType.VENDOR
 import static org.owasp.dependencycheck.reporting.ReportGenerator.Format
 import static org.owasp.dependencycheck.utils.Checksum.*
 
@@ -107,7 +109,7 @@ abstract class AbstractAnalyze extends ConfiguredTask {
                 }
                 showSummary(engine)
                 def result = checkForFailure(engine)
-                sendSlackNotification(result)
+                sendNotification(result)
                 if (result.failed) {
                     throw new GradleException(result.msg)
                 }
@@ -167,7 +169,7 @@ abstract class AbstractAnalyze extends ConfiguredTask {
         if (format != null && !selectedFormats.contains(format.toString())) {
             selectedFormats.add(format.toString());
         }
-        return selectedFormats;
+        return selectedFormats
     }
 
     /**
@@ -197,7 +199,7 @@ abstract class AbstractAnalyze extends ConfiguredTask {
 
         logger.warn("Found ${vulnerabilities.size()} vulnerabilities in project ${currentProjectName}")
         if (config.showSummary) {
-            DependencyCheckScanAgent.showSummary(project.name, engine.getDependencies());
+            DependencyCheckScanAgent.showSummary(project.name, engine.getDependencies())
         }
     }
 
@@ -234,9 +236,16 @@ abstract class AbstractAnalyze extends ConfiguredTask {
         }
     }
 
+    void sendNotification(CheckForFailureResult checkForFailureResult) {
+        if (checkForFailureResult.failed) {
+            new NotificationSenderService(settings).send(getCurrentProjectName(), checkForFailureResult.msg)
+        }
+    }
+
+    @Deprecated
     void sendSlackNotification(CheckForFailureResult checkForFailureResult) {
         if (checkForFailureResult.failed) {
-            new SlackNotificationSenderService(settings).send(getCurrentProjectName(), checkForFailureResult.msg)
+            new SlackAdapter(settings).send(getCurrentProjectName(), checkForFailureResult.msg)
         }
     }
 
@@ -353,7 +362,7 @@ abstract class AbstractAnalyze extends ConfiguredTask {
      * @param configuration the configuration to inspect
      * @return true if the configuration can be resolved; otherwise false
      */
-    def canBeResolved(configuration) {
+    static def canBeResolved(configuration) {
         configuration.metaClass.respondsTo(configuration, "isCanBeResolved") ?
                 configuration.isCanBeResolved() : true
     }
