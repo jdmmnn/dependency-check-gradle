@@ -37,7 +37,6 @@ import org.owasp.dependencycheck.dependency.Dependency
 import org.owasp.dependencycheck.exception.ExceptionCollection
 import org.owasp.dependencycheck.exception.ReportException
 import org.owasp.dependencycheck.gradle.service.NotificationSenderService
-import org.owasp.dependencycheck.gradle.service.adapter.SlackAdapter
 import org.owasp.dependencycheck.utils.SeverityUtil
 
 import java.util.stream.Collectors
@@ -239,13 +238,6 @@ abstract class AbstractAnalyze extends ConfiguredTask {
     void sendNotification(CheckForFailureResult checkForFailureResult) {
         if (checkForFailureResult.failed) {
             new NotificationSenderService(settings).send(getCurrentProjectName(), checkForFailureResult.msg)
-        }
-    }
-
-    @Deprecated
-    void sendSlackNotification(CheckForFailureResult checkForFailureResult) {
-        if (checkForFailureResult.failed) {
-            new SlackAdapter(settings).send(getCurrentProjectName(), checkForFailureResult.msg)
         }
     }
 

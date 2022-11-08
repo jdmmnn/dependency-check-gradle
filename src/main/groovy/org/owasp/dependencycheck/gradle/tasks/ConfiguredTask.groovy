@@ -23,6 +23,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.tasks.Internal
 import org.owasp.dependencycheck.gradle.service.adapter.SlackAdapter
+import org.owasp.dependencycheck.gradle.service.adapter.TeamsAdapter
 import org.owasp.dependencycheck.utils.Settings
 
 import static org.owasp.dependencycheck.utils.Settings.KEYS.*
@@ -76,6 +77,7 @@ abstract class ConfiguredTask extends DefaultTask {
         configureProxy(settings)
 
         configureSlack(settings)
+        configureTeams(settings)
 
         //settings.setStringIfNotEmpty(CONNECTION_TIMEOUT, connectionTimeout)
         settings.setStringIfNotNull(DATA_DIRECTORY, config.data.directory)
@@ -179,6 +181,13 @@ abstract class ConfiguredTask extends DefaultTask {
     private void configureSlack(Settings settings) {
         settings.setBooleanIfNotNull(SlackAdapter.SLACK__WEBHOOK__ENABLED, config.slack.enabled)
         settings.setStringIfNotEmpty(SlackAdapter.SLACK__WEBHOOK__URL, config.slack.webhookUrl)
+    }
+
+    private void configureTeams(Settings settings) {
+        settings.setBooleanIfNotNull(TeamsAdapter.TEAMS__WEBHOOK__ENABLED, config.teams.enabled)
+        settings.setStringIfNotEmpty(TeamsAdapter.TEAMS__WEBHOOK__URL, config.teams.webhookUrl)
+        settings.setStringIfNotEmpty(TeamsAdapter.TEAMS__WEBHOOK__MENTION__USER__EMAIL, config.teams.mentionUserEmail)
+        settings.setStringIfNotEmpty(TeamsAdapter.TEAMS__WEBHOOK__MENTION__USER__NAME, config.teams.mentionUserName)
     }
 
     private void configureProxy(Settings settings) {
